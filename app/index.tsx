@@ -26,6 +26,10 @@ export default function Index() {
     setLists([]);
   }
 
+  const deleteNote = (id: number) => {
+    setNotes(notes.filter(note => note.id !== id));
+  };
+
   const addList = () => {
 
   }
@@ -43,6 +47,8 @@ export default function Index() {
         <Text style={styles.buttonLabel}>Add Note</Text>
       </Pressable>
       <FlatList
+        contentContainerStyle={{justifyContent: 'center', alignItems: 'center', gap: 10}}
+        numColumns={2}
         data={notes}
         renderItem={({item}) => 
         <View 
@@ -54,6 +60,9 @@ export default function Index() {
             data={item.lists}
             renderItem={({item})=> <Text>{item}</Text>}
           />
+          <Pressable style={styles.deleteButton} onPress={() => deleteNote(item.id)}>
+              <Text style={styles.buttonLabel}>Delete</Text>
+            </Pressable>
         </View>}
       />
     </View>
@@ -74,19 +83,25 @@ const styles = StyleSheet.create({
     width: 100,
     margin: 10,
   },
+  deleteButton: {
+    borderRadius: 10,
+    backgroundColor: 'red',
+    padding: 10,
+    width: 100,
+    marginTop: 10,
+  },
   buttonLabel: {
     color: '#000',
     textAlign: 'center',
     fontWeight: 'bold',
   },
   note: {
-    width: 300,
+    width: 180,
     borderWidth: 1,
     borderRadius: 8,
     padding: 10,
     fontSize: 18,
-    margin: 10,
-    gap: 5,
+    margin: 5,
     backgroundColor: 'white',
     flexDirection: 'column',
   },
