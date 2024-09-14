@@ -18,15 +18,17 @@ interface InputProps {
   setTitle: (text: string) => void;
   description: string;
   setDescription: (text: string) => void;
+  lists: string[];
+  setLists: (text: string[]) => void;
 }
 
-export default function Input({title, setTitle, description, setDescription}: InputProps) {
+export default function Input({title, setTitle, description, setDescription, lists, setLists}: InputProps) {
   const [listInput, setListInput] = useState<string[]>(['']);
 
   const handleListInputChange = (text: string, index: number) => {
-    const updatedInputs = [...listInput];
+    const updatedInputs = [...lists];
     updatedInputs[index] = text;
-    setListInput(updatedInputs);
+    setLists(updatedInputs);
     if (index === updatedInputs.length - 1 && text !== '') {
       updatedInputs.push('');
     }
@@ -34,7 +36,7 @@ export default function Input({title, setTitle, description, setDescription}: In
     if (text === '' && index !== updatedInputs.length - 1) {
       updatedInputs.splice(index, 1);
     }
-    setListInput(updatedInputs);
+    setLists(updatedInputs);
   }
 
   return (
@@ -54,7 +56,7 @@ export default function Input({title, setTitle, description, setDescription}: In
         onChangeText={(val)=>setDescription(val)}
       />
       <View style={styles.listItemContainer}>
-        {listInput.map((input, index) => (
+        {lists.map((input, index) => (
           <View>
             <AutoExpandingTextInput
               key={index}
