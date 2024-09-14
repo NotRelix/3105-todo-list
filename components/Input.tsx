@@ -1,22 +1,60 @@
-import { Pressable, StyleSheet, Text, View, TextInput } from "react-native";
+import { Pressable, StyleSheet, Text, View, TextInput, FlatList} from "react-native";
 import { useState } from "react";
 
+interface Note{
+  id: number;
+  title: string;
+  lists: Array<string>;
+}
+
 export default function Input() {
+  const [id, setId] = useState(0);
+  const [title, setTitle] = useState('');
+  const [lists, setLists] = useState<string[]>([]);
+  const [notes, setNotes] = useState<Note[]>([]);
+
+  const addNotes = () => {
+    const curid = id+1;
+    const object: Note = { id: curid, title: title, lists: lists }; 
+    setId(curid);
+    setNotes([...notes, object]); 
+    setTitle('');
+    setLists([]);
+  }
+
   return (
     <View style={styles.inputContainer}>
       <TextInput 
         style={styles.input} 
         placeholder="Title"
         placeholderTextColor={'#E6E6E6'}
+        value={title}
+        onChangeText={(val)=>setTitle(val)}
       />
       <AutoExpandingTextInput 
         style={styles.input}
         placeholder="Description"
+        value={lists}
         placeholderTextColor={'#E6E6E6'}
       />
-      <Pressable style={styles.button} onPress={() => alert("You Clicked on a Button!")}>
+      <Pressable style={styles.button} onPress={addNotes}>
         <Text style={styles.buttonLabel}>Add</Text>
       </Pressable>
+      <View>
+        <FlatList
+          data={notes}
+          renderItem={({item}) => 
+          <View 
+          style={styles.note}
+          >
+            <Text>{item.id} {item.title}</Text>
+            <FlatList
+              data={item.lists}
+              renderItem={({item})=> <Text>{item}</Text>}
+            />
+          </View>}
+        />
+      </View>
     </View>
   );
 }
@@ -40,6 +78,14 @@ function AutoExpandingTextInput({...props}) {
 }
 
 const styles = StyleSheet.create({
+  note: {
+    width: 'auto',
+    borderWidth: 1,
+    padding: 10,
+    fontSize: 18,
+    height: 44,
+    backgroundColor: 'white',
+  },
   inputContainer: {
     alignItems: "center",
   },
