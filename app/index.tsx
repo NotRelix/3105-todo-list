@@ -37,11 +37,8 @@ export default function Index() {
         setTitle={setTitle}
         description={description}
         setDescription={setDescription}
-        notes={notes}
       />
-      <Pressable style={styles.button} onPress={addList}>
-        <Text style={styles.buttonLabel}>Add List</Text>
-      </Pressable>
+
       <Pressable style={styles.button} onPress={addNotes}>
         <Text style={styles.buttonLabel}>Add Note</Text>
       </Pressable>
