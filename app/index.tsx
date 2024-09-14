@@ -47,8 +47,6 @@ export default function Index() {
         <Text style={styles.buttonLabel}>Add Note</Text>
       </Pressable>
       <FlatList
-        contentContainerStyle={{justifyContent: 'center', alignItems: 'center', gap: 10}}
-        numColumns={2}
         data={notes}
         renderItem={({item}) => 
         <View 
@@ -96,7 +94,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   note: {
-    width: 180,
+    width: 300,
     borderWidth: 1,
     borderRadius: 8,
     padding: 10,
