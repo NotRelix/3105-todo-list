@@ -1,27 +1,27 @@
-import { Pressable, StyleSheet, Text, View, TextInput, FlatList} from "react-native";
+import { Pressable, StyleSheet, Text, View, TextInput } from "react-native";
 import { useState } from "react";
 
-interface Note{
+interface Note {
   id: number;
   title: string;
+  description: string;
   lists: Array<string>;
 }
 
-export default function Input() {
-  const [id, setId] = useState(0);
-  const [title, setTitle] = useState('');
-  const [lists, setLists] = useState<string[]>([]);
-  const [notes, setNotes] = useState<Note[]>([]);
+interface AutoExpandingTextInputProps extends React.ComponentProps<typeof TextInput> {
+  value?: string;
+  onChangeText?: (text: string) => void;
+}
 
-  const addNotes = () => {
-    const curid = id+1;
-    const object: Note = { id: curid, title: title, lists: lists }; 
-    setId(curid);
-    setNotes([...notes, object]); 
-    setTitle('');
-    setLists([]);
-  }
+interface InputProps {
+  title: string;
+  setTitle: (text: string) => void;
+  description: string;
+  setDescription: (text: string) => void;
+  notes: Note[];
+}
 
+export default function Input({title, setTitle, description, setDescription, notes}: InputProps) {
   return (
     <View style={styles.inputContainer}>
       <TextInput 
@@ -34,71 +34,34 @@ export default function Input() {
       <AutoExpandingTextInput 
         style={styles.input}
         placeholder="Description"
-        value={lists}
         placeholderTextColor={'#E6E6E6'}
+        value={description}
+        onChangeText={(val)=>setDescription(val)}
       />
-      <Pressable style={styles.button} onPress={addNotes}>
-        <Text style={styles.buttonLabel}>Add</Text>
-      </Pressable>
-      <View>
-        <FlatList
-          data={notes}
-          renderItem={({item}) => 
-          <View 
-          style={styles.note}
-          >
-            <Text>{item.id} {item.title}</Text>
-            <FlatList
-              data={item.lists}
-              renderItem={({item})=> <Text>{item}</Text>}
-            />
-          </View>}
-        />
-      </View>
     </View>
   );
 }
 
-function AutoExpandingTextInput({...props}) {
-  const [text, setText] = useState('');
+function AutoExpandingTextInput({value, onChangeText, ...props}: AutoExpandingTextInputProps) {
   const [height, setHeight] = useState(0);
 
   return (
     <TextInput 
       {...props}
       multiline={true}
-      onChangeText={(text) => setText(text)}
+      onChangeText={onChangeText}
       onContentSizeChange={(event) => {
         setHeight(event.nativeEvent.contentSize.height)
       }}
       style={[styles.input, {height: Math.max(55, height)}]}
-      value={text}
+      value={value}
     />
   )
 }
 
 const styles = StyleSheet.create({
-  note: {
-    width: 'auto',
-    borderWidth: 1,
-    padding: 10,
-    fontSize: 18,
-    height: 44,
-    backgroundColor: 'white',
-  },
   inputContainer: {
     alignItems: "center",
-  },
-  button: {
-    borderRadius: 10,
-    backgroundColor: '#fff',
-    padding: 10,
-    width: 100,
-  },
-  buttonLabel: {
-    color: '#000',
-    textAlign: 'center',
-    fontWeight: 'bold',
   },
   input: {
     padding: 10,
