@@ -76,7 +76,7 @@ export default function Index() {
         <Text style={styles.buttonLabel}>Add Note</Text>
       </Pressable>
       <Modal
-        animationType="slide"
+        animationType="fade"
         transparent={true}
         visible={modalVisible}
         onRequestClose={() => {
@@ -94,7 +94,7 @@ export default function Index() {
                         }
                       }}
                     >
-                  <Text style={styles.buttonLabel}>Delete</Text>
+                  <Text style={styles.notetext}>Delete</Text>
                 </Pressable>
               </View>
             </View>
@@ -102,12 +102,14 @@ export default function Index() {
               <TextInput
                 style={[styles.input, styles.inputTitle]} 
                 value={singleNote?.title}
+                placeholderTextColor={'#E6E6E6'}
                 placeholder="Title"
                 onChangeText={(text)=> {if(singleNote){updateTitle(text, singleNote.id)}}}
               />
               <TextInput
-                style={[styles.input, styles.inputTitle]} 
+                style={styles.input} 
                 value={singleNote?.description}
+                placeholderTextColor={'#E6E6E6'}
                 placeholder="Description"
                 onChangeText={(text)=> {if(singleNote){updateDesc(text, singleNote.id)}}}
               />
@@ -115,7 +117,7 @@ export default function Index() {
             <View style={styles.buttoncontainer}>
               <Pressable
                 onPress={() => setModalVisible(!modalVisible)}>
-                <Text>Close</Text>
+                <Text style={styles.notetext}>Close</Text>
               </Pressable>
             </View>
           </View>
@@ -165,9 +167,12 @@ const styles = StyleSheet.create({
     marginTop: 22,
   },
   modalView: {
-    margin: 10,
-    backgroundColor: '#E6E6E6',
+    margin: 5,
+    borderWidth: 1,
+    backgroundColor:'#25292E',
+    borderColor: '#E6E6E6',
     borderRadius: 20,
+    padding: 10,
     width: 300,
     minHeight: 50,
     shadowOffset: {
@@ -180,9 +185,6 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     alignItems: "center",
-    borderWidth: 1,
-    borderRadius: 8,
-    borderColor: '#E6E6E6',
     paddingTop: 10,
     paddingBottom: 20, 
   },
@@ -192,6 +194,7 @@ const styles = StyleSheet.create({
     // borderWidth: 1,
     borderRadius: 8,
     borderColor: '#E6E6E6',
+    color: '#E6E6E6',
     maxHeight: 150,
     minHeight: 10,
     textAlignVertical: 'top',
