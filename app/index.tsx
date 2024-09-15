@@ -14,7 +14,7 @@ export default function Index() {
   const [id, setId] = useState(0);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [lists, setLists] = useState<string[]>([]);
+  const [lists, setLists] = useState<string[]>(['']);
   const [notes, setNotes] = useState<Note[]>([]);
   const [singleNote, setSingleNote] = useState<Note>();
 
@@ -25,7 +25,7 @@ export default function Index() {
     setNotes([...notes, object]); 
     setTitle('');
     setDescription('');
-    setLists([]);
+    setLists(['']);
   }
 
   const deleteNote = (id: number) => {
@@ -71,6 +71,8 @@ export default function Index() {
         setTitle={setTitle}
         description={description}
         setDescription={setDescription}
+        lists={lists}
+        setLists={setLists}
       />
       <Pressable style={styles.button} onPress={addNotes}>
         <Text style={styles.buttonLabel}>Add Note</Text>
@@ -133,7 +135,7 @@ export default function Index() {
 
           <FlatList
             data={item.lists}
-            renderItem={({item})=> <Text>ds{item}</Text>}
+            renderItem={({item})=> <Text style={styles.notetext}>{item}</Text>}
           />
         </Pressable>}
       />
