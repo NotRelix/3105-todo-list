@@ -23,7 +23,6 @@ interface InputProps {
 }
 
 export default function Input({title, setTitle, description, setDescription, lists, setLists}: InputProps) {
-  const [listInput, setListInput] = useState<string[]>(['']);
 
   const handleListInputChange = (text: string, index: number) => {
     const updatedInputs = [...lists];

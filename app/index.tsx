@@ -15,6 +15,7 @@ export default function Index() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [lists, setLists] = useState<string[]>(['']);
+  const [completedLists, setCompletedLists] = useState<string[]>(['']);
   const [notes, setNotes] = useState<Note[]>([]);
   const [singleNote, setSingleNote] = useState<Note>();
 
@@ -36,7 +37,7 @@ export default function Index() {
 
   }
 
-  const passValue = (note: Note) => {
+  const passNoteValue = (note: Note) => {
     setSingleNote(note);
   }
 
@@ -63,6 +64,40 @@ export default function Index() {
       setSingleNote({ ...singleNote, description: text });
     }
   };
+
+  const updateList = (text: string, id: number) => {
+    const updatedNotes = notes.map(note =>
+      note.id === id ? { ...note, description: text } : note
+    );
+    
+    setNotes(updatedNotes);
+  
+    if (singleNote?.id === id) {
+      setSingleNote({ ...singleNote, description: text });
+    }
+  };
+
+  const handleListInputChange = (text: string, index: number) => {
+    if (singleNote) {
+      const updatedLists = [...singleNote.lists]; 
+      updatedLists[index] = text; 
+      if (index === updatedLists.length - 1 && text !== '') {
+          updatedLists.push('');
+      }
+
+      if (text === '' && index !== updatedLists.length - 1) {
+          updatedLists.splice(index, 1);
+      }
+
+      setSingleNote({ ...singleNote, lists: updatedLists });
+      const updatedNotes = notes.map(note => 
+          note.id === singleNote.id 
+              ? { ...note, lists: singleNote.lists }
+              : note 
+      );
+      setNotes(updatedNotes); 
+  }
+  }
 
   return (
     <View style={styles.container}>
@@ -115,6 +150,18 @@ export default function Index() {
                 placeholder="Description"
                 onChangeText={(text)=> {if(singleNote){updateDesc(text, singleNote.id)}}}
               />
+              <FlatList
+                data={singleNote?.lists}
+                renderItem={({item, index})=>
+                  <TextInput
+                    key={index}
+                    style={styles.input} 
+                    value={item}
+                    placeholderTextColor={'#E6E6E6'}
+                    placeholder="+ List item"
+                    onChangeText={(text)=> {if(singleNote){handleListInputChange(text, index)}}}
+                />}
+              />
             </View>
             <View style={styles.buttoncontainer}>
               <Pressable
@@ -126,10 +173,11 @@ export default function Index() {
         </View>
       </Modal>
       <FlatList
-        numColumns={2}
+        numColumns={1}
         data={notes}
+        key={singleNote?.id}
         renderItem={({item}) => 
-        <Pressable onPress={() => {setModalVisible(true); passValue(item);}} style={styles.note}>
+        <Pressable onPress={() => {setModalVisible(true); passNoteValue(item);}} style={styles.note}>
           <Text style={[styles.notetext, styles.notetitle]}>{item.title}</Text>
           <Text style={styles.notetext}>{item.description}</Text>
 
@@ -235,7 +283,7 @@ const styles = StyleSheet.create({
     width: 300,
     borderColor: '#E6E6E6',
     borderWidth: 1,
-    borderColor: '#E6E6E6',
+    borderBlockColor: '#E6E6E6',
     borderRadius: 8,
     padding: 10,
     fontSize: 18,
