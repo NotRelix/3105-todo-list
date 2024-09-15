@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    paddingTop: 80,
+    paddingTop: 60,
     backgroundColor: '#25292e',
     alignItems: 'center',
   },
@@ -222,10 +222,9 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     borderRadius: 10,
-    backgroundColor: 'red',
+    backgroundColor: '#F06868',
     padding: 10,
     width: 100,
-    marginTop: 10,
   },
   buttonLabel: {
     color: '#000',
@@ -234,6 +233,7 @@ const styles = StyleSheet.create({
   },
   note: {
     width: 300,
+    borderColor: '#E6E6E6',
     borderWidth: 1,
     borderColor: '#E6E6E6',
     borderRadius: 8,
@@ -245,5 +245,8 @@ const styles = StyleSheet.create({
   },
   notetext: {
     color: '#E6E6E6'
+  },
+  content: {
+    color: '#E6E6E6',
   },
 });
