@@ -184,12 +184,12 @@ export default function Index() {
 
           <FlatList
             data={item.lists
-              .map((listItem, index) => ({ listItem, index })) // Keep track of original index
+              .map((listItem, index) => ({ listItem, index }))
               .filter(({listItem}) => listItem !== '')
-              .filter(({ index }) => !item.completedLists.includes(index)) // Filter out completed items
+              .filter(({ index }) => !item.completedLists.includes(index))
             }
             renderItem={({ item: { listItem, index } }) => {
-              const isChecked = item.completedLists.includes(index); // Check using the original index
+              const isChecked = item.completedLists.includes(index);
               return (
                 <View style={{ flexDirection: 'row' }}>
                   <CheckBox
@@ -199,8 +199,8 @@ export default function Index() {
                       const updatedNotes = notes.map((note) => {
                         if (note.id === item.id) {
                           const updatedCompletedLists = isChecked
-                            ? note.completedLists.filter(i => i !== index) // Remove from completed lists
-                            : [...note.completedLists, index]; // Add to completed lists
+                            ? note.completedLists.filter(i => i !== index)
+                            : [...note.completedLists, index];
                           return { ...note, completedLists: updatedCompletedLists };
                         }
                         return note;
@@ -211,19 +211,19 @@ export default function Index() {
                 </View>
               );
             }}
-            keyExtractor={(item, index) => index.toString()} // Use original index for key
-            extraData={notes} // Trigger re-render when notes change
+            keyExtractor={(item, index) => index.toString()}
+            extraData={notes} 
           />
 
           {item.completedLists.length > 0 && <Text style={styles.content}>Completed:</Text>}
 
           <FlatList
             data={item.lists
-              .map((listItem, index) => ({ listItem, index })) // Keep track of original index
-              .filter(({ index }) => item.completedLists.includes(index)) // Filter out completed items
+              .map((listItem, index) => ({ listItem, index })) 
+              .filter(({ index }) => item.completedLists.includes(index)) 
             }
             renderItem={({ item: { listItem, index } }) => {
-              const isChecked = item.completedLists.includes(index); // Check using the original index
+              const isChecked = item.completedLists.includes(index);
               return (
                 <View style={{ flexDirection: 'row' }}>
                   <CheckBox
@@ -233,8 +233,8 @@ export default function Index() {
                       const updatedNotes = notes.map((note) => {
                         if (note.id === item.id) {
                           const updatedCompletedLists = isChecked
-                            ? note.completedLists.filter(i => i !== index) // Remove from completed lists
-                            : [...note.completedLists, index]; // Add to completed lists
+                            ? note.completedLists.filter(i => i !== index)
+                            : [...note.completedLists, index];
                           return { ...note, completedLists: updatedCompletedLists };
                         }
                         return note;
@@ -245,8 +245,8 @@ export default function Index() {
                 </View>
               );
             }}
-            keyExtractor={(item, index) => index.toString()} // Use original index for key
-            extraData={notes} // Trigger re-render when notes change
+            keyExtractor={(item, index) => index.toString()}
+            extraData={notes}
           />
 
           <Pressable 
