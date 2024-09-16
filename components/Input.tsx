@@ -60,7 +60,7 @@ export default function Input({title, setTitle, description, setDescription, lis
             <AutoExpandingTextInput
               key={index}
               placeholder="+ List item"
-              placeholderTextColor={'#E6E6E6'}
+              placeholderTextColor={'#979797'}
               value={input}
               onChangeText={(text) => handleListInputChange(text, index)}
             />

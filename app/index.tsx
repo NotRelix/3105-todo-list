@@ -187,9 +187,9 @@ export default function Index() {
                     )}
                     <TextInput
                       key={index}
-                      style={styles.input} 
+                      style={[styles.input]}
                       value={listItem}
-                      placeholderTextColor={'#E6E6E6'}
+                      placeholderTextColor={'#979797'}
                       placeholder="+ List item"
                       onChangeText={(text)=> {if(singleNote){handleListInputChange(text, index)}}}
                     />
