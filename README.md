@@ -2,7 +2,7 @@
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
-## Google drive link
+## Screenshots and Video Demo Drive Link
 
 [https://drive.google.com/drive/u/1/folders/1bSJRmC4kPx6b3KfVU0a6JKZK1o6ircIl](https://drive.google.com/drive/folders/1bSJRmC4kPx6b3KfVU0a6JKZK1o6ircIl?usp=drive_link)
 
