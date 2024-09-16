@@ -160,9 +160,11 @@ export default function Index() {
                 .filter(({ index }) => !singleNote?.completedLists.includes(index)) 
               }
               renderItem={({ item: { listItem, index } }) => {
+                const isPlaceholder = listItem === '';
                 const isChecked = singleNote?.completedLists.includes(index)||false;
                 return (
                   <View style={{flexDirection: 'row'}}>
+                    {!isPlaceholder && (
                     <CheckBox
                       checked={isChecked}
                       containerStyle={styles.checkboxContainer}
@@ -181,6 +183,7 @@ export default function Index() {
                         setNotes(updatedNotes);
                       }}
                     />
+                    )}
                     <TextInput
                       key={index}
                       style={styles.input} 
