@@ -1,12 +1,17 @@
 import Input from "@/components/Input";
 import { Pressable, StyleSheet, Text, View, TextInput, FlatList, Modal} from "react-native";
 import { useState } from "react";
+import { CheckBox } from '@rneui/themed';
+import { ListItem } from "@rneui/base";
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 interface Note{
   id: number;
   title: string;
   description: string;
   lists: Array<string>;
+  completedLists: Array<number>;
+  selectAll: boolean;
 }
 
 export default function Index() {
@@ -19,8 +24,11 @@ export default function Index() {
   const [singleNote, setSingleNote] = useState<Note>();
 
   const addNotes = () => {
+    if (title.trim() === '' && description.trim() === '' && lists.every(list => list.trim() === '')) {
+      return;
+    }
     const curid = id + 1;
-    const object: Note = { id: curid, title: title, description: description, lists: lists }; 
+    const object: Note = { id: curid, title: title, description: description, lists: lists, completedLists: [], selectAll: false }; 
     setId(curid);
     setNotes([...notes, object]); 
     setTitle('');
@@ -32,11 +40,7 @@ export default function Index() {
     setNotes(notes.filter(note => note.id !== id));
   };
 
-  const addList = () => {
-
-  }
-
-  const passValue = (note: Note) => {
+  const passNoteValue = (note: Note) => {
     setSingleNote(note);
   }
 
@@ -64,6 +68,40 @@ export default function Index() {
     }
   };
 
+  const updateList = (text: string, id: number) => {
+    const updatedNotes = notes.map(note =>
+      note.id === id ? { ...note, description: text } : note
+    );
+    
+    setNotes(updatedNotes);
+  
+    if (singleNote?.id === id) {
+      setSingleNote({ ...singleNote, description: text });
+    }
+  };
+
+  const handleListInputChange = (text: string, index: number) => {
+    if (singleNote) {
+      const updatedLists = [...singleNote.lists]; 
+      updatedLists[index] = text; 
+      if (index === updatedLists.length - 1 && text !== '') {
+          updatedLists.push('');
+      }
+
+      if (text === '' && index !== updatedLists.length - 1) {
+          updatedLists.splice(index, 1);
+      }
+      
+      const updatedNote = { ...singleNote, lists: updatedLists };
+      setSingleNote(updatedNote);  
+
+      const updatedNotes = notes.map(note => 
+        note.id === singleNote.id ? { ...note, lists: updatedLists } : note
+      );
+      setNotes(updatedNotes);
+    }
+  }
+
   return (
     <View style={styles.container}>
       <Input 
@@ -74,6 +112,7 @@ export default function Index() {
         lists={lists}
         setLists={setLists}
       />
+      
       <Pressable style={styles.button} onPress={addNotes}>
         <Text style={styles.buttonLabel}>Add Note</Text>
       </Pressable>
@@ -85,22 +124,8 @@ export default function Index() {
           setModalVisible(!modalVisible);
         }}>
         <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <View style={styles.topcontainer}>
-              <View style={styles.buttoncontainer}>
-                <Pressable
-                      onPress={() => {
-                        if (singleNote) {
-                          deleteNote(singleNote.id);
-                          setModalVisible(!modalVisible);
-                        }
-                      }}
-                    >
-                  <Text style={styles.notetext}>Delete</Text>
-                </Pressable>
-              </View>
-            </View>
-            <View style={styles.inputContainer}>
+          <View style={[styles.modalView, {borderWidth: 5}]}>
+            <View style={[styles.note, { borderWidth: 0 }]}>
               <TextInput
                 style={[styles.input, styles.inputTitle]} 
                 value={singleNote?.title}
@@ -115,29 +140,254 @@ export default function Index() {
                 placeholder="Description"
                 onChangeText={(text)=> {if(singleNote){updateDesc(text, singleNote.id)}}}
               />
+              
+              {/* //Edit Incompleted List */}
+              <FlatList
+               data={singleNote?.lists
+                .map((listItem, index) => ({ listItem, index })) 
+                .filter(({ index }) => !singleNote?.completedLists.includes(index)) 
+              }
+              renderItem={({ item: { listItem, index } }) => {
+                const isPlaceholder = listItem === '';
+                const isChecked = singleNote?.completedLists.includes(index)||false;
+                return (
+                  <View style={{flexDirection: 'row'}}>
+                    {!isPlaceholder && (
+                    <CheckBox
+                      checked={isChecked}
+                      containerStyle={styles.checkboxContainer}
+                      textStyle={[styles.checkboxText, styles.checkboxComplete]}
+                      checkedColor="#979797"
+                      onPress={() => {
+                        const updatedNotes = notes.map((note) => {
+                          if (note.id === singleNote?.id) {
+                            const updatedCompletedLists = isChecked
+                              ? note.completedLists.filter(i => i !== index)
+                              : [...note.completedLists, index];
+                            return { ...note, completedLists: updatedCompletedLists };
+                          }
+                          return note;
+                        });
+                        setNotes(updatedNotes);
+                        setSingleNote(prev => prev ? { ...prev, completedLists: updatedNotes.find(note => note.id === prev.id)?.completedLists || [] } : undefined);
+                      }}
+                    />
+                    )}
+                    <TextInput
+                      key={index}
+                      style={[styles.input, {fontWeight: 'bold'}]}
+                      value={listItem}
+                      placeholderTextColor={'#979797'}
+                      placeholder="+ List item"
+                      onChangeText={(text)=> {if(singleNote){handleListInputChange(text, index)}}}
+                    />
+                  </View>
+                );
+              }}
+              keyExtractor={(item, index) => index.toString()}
+              extraData={notes}
+              />
+
+              {/* Edit Completed List */}
+              <FlatList
+               data={singleNote?.lists
+                .map((listItem, index) => ({ listItem, index })) 
+                .filter(({ index }) => singleNote?.completedLists.includes(index)) 
+              }
+              renderItem={({ item: { listItem, index } }) => {
+                const isChecked = singleNote?.completedLists.includes(index)||false;
+                return (
+                  <View style={{flexDirection: 'row'}}>
+                    <CheckBox
+                      checked={isChecked}
+                      containerStyle={styles.checkboxContainer}
+                      textStyle={[styles.checkboxText, styles.checkboxComplete]}
+                      checkedColor="#979797"
+                      onPress={() => {
+                        const updatedNotes = notes.map((note) => {
+                          if (note.id === singleNote?.id) {
+                            const updatedCompletedLists = isChecked
+                              ? note.completedLists.filter(i => i !== index)
+                              : [...note.completedLists, index];
+                            return { ...note, completedLists: updatedCompletedLists };
+                          }
+                          return note;
+                        });
+                        setNotes(updatedNotes);
+                        setSingleNote(prev => prev ? { ...prev, completedLists: updatedNotes.find(note => note.id === prev.id)?.completedLists || [] } : undefined);
+                      }}
+                    />
+                    <TextInput
+                      key={index}
+                      style={[styles.input, {fontWeight: 'bold'}]} 
+                      value={listItem}
+                      placeholderTextColor={'#E6E6E6'}
+                      placeholder="+ List item"
+                      onChangeText={(text)=> {if(singleNote){handleListInputChange(text, index)}}}
+                    />
+                  </View>
+                );
+              }}
+              keyExtractor={(item, index) => index.toString()}
+              extraData={notes}
+              />
+
+              {/* Select All/Unselect All for Incomplete Lists */}
+              <CheckBox
+                title={singleNote?.completedLists.length === singleNote?.lists.filter(listItem => listItem !== '').length ? "Unselect All" : "Select All"}
+                checked={singleNote?.completedLists.length === singleNote?.lists.filter(listItem => listItem !== '').length}
+                containerStyle={styles.checkboxContainer}
+                onPress={() => {
+                  const updatedNotes = notes.map((note) => {
+                    if (note.id === singleNote?.id) {
+                      const nonEmptyIndexes = singleNote.lists
+                        .map((listItem, index) => listItem.trim() !== '' ? index : null)
+                        .filter(index => index !== null);
+                      const updatedCompletedLists = singleNote.completedLists.length === nonEmptyIndexes.length
+                        ? [] 
+                        : nonEmptyIndexes;
+                      return { ...note, completedLists: updatedCompletedLists };
+                    }
+                    return note;
+                  });
+                  setNotes(updatedNotes);
+                  setSingleNote(prev => prev ? { ...prev, completedLists: updatedNotes.find(note => note.id === prev.id)?.completedLists || [] } : undefined);
+                }}
+              />
             </View>
             <View style={styles.buttoncontainer}>
+              {/* Delete */}
+              <Pressable
+                    onPress={() => {
+                      if (singleNote) {
+                        deleteNote(singleNote.id);
+                        setModalVisible(!modalVisible);
+                      }
+                    }}
+                  >
+                <Text style={[styles.icon,styles.notetext]}><Icon name="trash" size={20} color="white"/></Text>
+              </Pressable>
+              {/* Close */}
               <Pressable
                 onPress={() => setModalVisible(!modalVisible)}>
-                <Text style={styles.notetext}>Close</Text>
+                <Text style={[styles.icon, styles.notetext]}><Icon name="reply" size={20} color="white" /></Text>
               </Pressable>
             </View>
           </View>
         </View>
       </Modal>
+
       <FlatList
-        numColumns={2}
+        numColumns={1}
         data={notes}
+        key={singleNote?.id}
         renderItem={({item}) => 
-        <Pressable onPress={() => {setModalVisible(true); passValue(item);}} style={styles.note}>
+        <View style={styles.note}>
           <Text style={[styles.notetext, styles.notetitle]}>{item.title}</Text>
-          <Text style={styles.notetext}>{item.description}</Text>
+          <Text style={[styles.notetext, styles.notedesc]}>{item.description}</Text>
 
           <FlatList
-            data={item.lists}
-            renderItem={({item})=> <Text style={styles.notetext}>{item}</Text>}
+            data={item.lists
+              .map((listItem, index) => ({ listItem, index }))
+              .filter(({listItem}) => listItem !== '')
+              .filter(({ index }) => !item.completedLists.includes(index))
+            }
+            renderItem={({ item: { listItem, index } }) => {
+              const isChecked = item.completedLists.includes(index);
+              return (
+                <View>
+                  <CheckBox
+                    title={listItem}
+                    checked={isChecked}
+                    containerStyle={styles.checkboxContainer}
+                    textStyle={styles.checkboxText}
+                    onPress={() => {
+                      const updatedNotes = notes.map((note) => {
+                        if (note.id === item.id) {
+                          const updatedCompletedLists = isChecked
+                            ? note.completedLists.filter(i => i !== index)
+                            : [...note.completedLists, index];
+                          return { ...note, completedLists: updatedCompletedLists };
+                        }
+                        return note;
+                      });
+                      setNotes(updatedNotes);
+                      
+                    }}
+                  />
+                </View>
+              );
+            }}
+            keyExtractor={(item, index) => index.toString()}
+            extraData={notes} 
           />
-        </Pressable>}
+
+          <FlatList
+            data={item.lists
+              .map((listItem, index) => ({ listItem, index })) 
+              .filter(({ index }) => item.completedLists.includes(index)) 
+            }
+            renderItem={({ item: { listItem, index } }) => {
+              const isChecked = item.completedLists.includes(index);
+              return (
+                <View style={{flexDirection: 'row'}}>
+                  <CheckBox
+                    title={listItem}
+                    checked={isChecked}
+                    containerStyle={styles.checkboxContainer}
+                    textStyle={[styles.checkboxText, styles.checkboxComplete]}
+                    checkedColor="#979797"
+                    onPress={() => {
+                      const updatedNotes = notes.map((note) => {
+                        if (note.id === item.id) {
+                          const updatedCompletedLists = isChecked
+                            ? note.completedLists.filter(i => i !== index)
+                            : [...note.completedLists, index];
+                          return { ...note, completedLists: updatedCompletedLists };
+                        }
+                        return note;
+                      });
+                      setNotes(updatedNotes);
+                    }}
+                  />
+                </View>
+              );
+            }}
+            keyExtractor={(item, index) => index.toString()}
+            extraData={notes}
+          />
+
+          <CheckBox
+            title={item.completedLists.length === item.lists.filter(listItem => listItem !== '').length ? "Unselect All" : "Select All"}
+            checked={item.completedLists.length === item.lists.filter(listItem => listItem !== '').length}
+            containerStyle={styles.checkboxContainer}
+            onPress={() => {
+              const updatedNotes = notes.map((note) => {
+                if (note.id === item.id) {
+                  const nonEmptyIndexes = item.lists
+                    .map((listItem, index) => listItem.trim() !== '' ? index : null)
+                    .filter(index => index !== null);
+                  const updatedCompletedLists = item.completedLists.length === nonEmptyIndexes.length
+                    ? [] 
+                    : nonEmptyIndexes;
+                  return { ...note, completedLists: updatedCompletedLists };
+                }
+                return note;
+              });
+              setNotes(updatedNotes);
+            }}
+          />
+
+          <Pressable 
+            style={styles.button}
+            onPress={() => {
+              setModalVisible(true);
+              passNoteValue(item);
+            }}
+          >
+            <Text style={styles.buttonLabel}>Edit</Text>
+          </Pressable>
+        </View>}
       />
     </View>
   );
@@ -155,28 +405,24 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   buttoncontainer: {
-    padding: 20,
+    // padding: 20,
     width: '100%',
-    height: 20,
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     alignItems: 'center'
   },
   centeredView: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 22,
   },
   modalView: {
     margin: 5,
     borderWidth: 1,
     backgroundColor:'#25292E',
     borderColor: '#E6E6E6',
-    borderRadius: 20,
-    padding: 10,
+    borderRadius: 8,
     width: 300,
-    minHeight: 50,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -187,8 +433,8 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     alignItems: "center",
-    paddingTop: 10,
-    paddingBottom: 20, 
+    // paddingTop: 10,
+    // paddingBottom: 20, 
   },
   input: {
     width: 280,
@@ -233,20 +479,41 @@ const styles = StyleSheet.create({
   },
   note: {
     width: 300,
+    marginBottom: 20,
     borderColor: '#E6E6E6',
     borderWidth: 1,
-    borderColor: '#E6E6E6',
+    borderBlockColor: '#E6E6E6',
     borderRadius: 8,
     padding: 10,
     fontSize: 18,
-    margin: 5,
     flexDirection: 'column',
     minHeight: 50,
   },
   notetext: {
     color: '#E6E6E6'
   },
+  notedesc: {
+    marginBottom: 10,
+  },
   content: {
     color: '#E6E6E6',
   },
+  completed: {
+    color: '#979797',
+    marginTop: 10,
+  },
+  checkboxContainer: {
+    backgroundColor: '#25292e',
+    padding: 0,
+  },
+  checkboxText: {
+    color: '#E6E6E6'
+  },
+  checkboxComplete: {
+    textDecorationLine: 'line-through',
+    color: '#979797',
+  },
+  icon: {
+    padding: 10,
+  }
 });

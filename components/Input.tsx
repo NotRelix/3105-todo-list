@@ -23,7 +23,6 @@ interface InputProps {
 }
 
 export default function Input({title, setTitle, description, setDescription, lists, setLists}: InputProps) {
-  const [listInput, setListInput] = useState<string[]>(['']);
 
   const handleListInputChange = (text: string, index: number) => {
     const updatedInputs = [...lists];
@@ -57,11 +56,11 @@ export default function Input({title, setTitle, description, setDescription, lis
       />
       <View style={styles.listItemContainer}>
         {lists.map((input, index) => (
-          <View>
+          <View key={`list-item-${index}`}>
             <AutoExpandingTextInput
               key={index}
               placeholder="+ List item"
-              placeholderTextColor={'#E6E6E6'}
+              placeholderTextColor={'#979797'}
               value={input}
               onChangeText={(text) => handleListInputChange(text, index)}
             />
