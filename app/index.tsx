@@ -180,32 +180,72 @@ export default function Index() {
           <Text style={styles.notetext}>{item.description}</Text>
 
           <FlatList
-            data={item.lists.filter((listItem => listItem !== ''))}
-            renderItem={({item: listItem, index})=> {
-              const isChecked = item.completedLists.includes(index);
+            data={item.lists
+              .map((listItem, index) => ({ listItem, index })) // Keep track of original index
+              .filter(({listItem}) => listItem !== '')
+              .filter(({ index }) => !item.completedLists.includes(index)) // Filter out completed items
+            }
+            renderItem={({ item: { listItem, index } }) => {
+              const isChecked = item.completedLists.includes(index); // Check using the original index
               return (
-              <View style={{ flexDirection:'row'}}>
-                <CheckBox
-                  title={listItem}
-                  checked={isChecked}
-                  onPress={() => {
-                    const updatedNotes = notes.map((note) => {
-                      if (note.id === item.id) {
-                        const updatedCompmletedLists = isChecked 
-                          ? note.completedLists.filter(i => i !== index)
-                          : [...note.completedLists, index];
-                          return { ...note, completedLists: updatedCompmletedLists}
-                      }
-                      return note;
-                    });
-                    setNotes(updatedNotes);
-                  }}
-                />
-              </View>
-              )
+                <View style={{ flexDirection: 'row' }}>
+                  <CheckBox
+                    title={listItem}
+                    checked={isChecked}
+                    onPress={() => {
+                      const updatedNotes = notes.map((note) => {
+                        if (note.id === item.id) {
+                          const updatedCompletedLists = isChecked
+                            ? note.completedLists.filter(i => i !== index) // Remove from completed lists
+                            : [...note.completedLists, index]; // Add to completed lists
+                          return { ...note, completedLists: updatedCompletedLists };
+                        }
+                        return note;
+                      });
+                      setNotes(updatedNotes);
+                    }}
+                  />
+                </View>
+              );
             }}
-            keyExtractor={(item, index) => index.toString()}
+            keyExtractor={(item, index) => index.toString()} // Use original index for key
+            extraData={notes} // Trigger re-render when notes change
           />
+
+          {item.completedLists.length > 0 && <Text style={styles.content}>Completed:</Text>}
+
+          <FlatList
+            data={item.lists
+              .map((listItem, index) => ({ listItem, index })) // Keep track of original index
+              .filter(({ index }) => item.completedLists.includes(index)) // Filter out completed items
+            }
+            renderItem={({ item: { listItem, index } }) => {
+              const isChecked = item.completedLists.includes(index); // Check using the original index
+              return (
+                <View style={{ flexDirection: 'row' }}>
+                  <CheckBox
+                    title={listItem}
+                    checked={isChecked}
+                    onPress={() => {
+                      const updatedNotes = notes.map((note) => {
+                        if (note.id === item.id) {
+                          const updatedCompletedLists = isChecked
+                            ? note.completedLists.filter(i => i !== index) // Remove from completed lists
+                            : [...note.completedLists, index]; // Add to completed lists
+                          return { ...note, completedLists: updatedCompletedLists };
+                        }
+                        return note;
+                      });
+                      setNotes(updatedNotes);
+                    }}
+                  />
+                </View>
+              );
+            }}
+            keyExtractor={(item, index) => index.toString()} // Use original index for key
+            extraData={notes} // Trigger re-render when notes change
+          />
+
           <Pressable 
             style={styles.button}
             onPress={() => {
