@@ -227,7 +227,11 @@ export default function Index() {
               return (
                 <View style={{ flexDirection: 'row' }}>
                   <CheckBox
-                    title={listItem}
+                    title={
+                      <Text style={{ textDecorationLine: isChecked ? 'line-through' : 'none' }}>
+                        {listItem}
+                      </Text>
+                    }
                     checked={isChecked}
                     onPress={() => {
                       const updatedNotes = notes.map((note) => {
