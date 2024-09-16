@@ -125,7 +125,7 @@ export default function Index() {
         }}>
         <View style={styles.centeredView}>
           <View style={[styles.modalView, {borderWidth: 5}]}>
-            <View style={[styles.note, { borderWidth: 0 }]}>
+            <View style={[styles.note, { borderWidth: 0, marginBottom: 0}]}>
               <TextInput
                 style={[styles.input, styles.inputTitle]} 
                 value={singleNote?.title}
