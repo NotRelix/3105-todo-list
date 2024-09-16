@@ -56,7 +56,7 @@ export default function Input({title, setTitle, description, setDescription, lis
       />
       <View style={styles.listItemContainer}>
         {lists.map((input, index) => (
-          <View>
+          <View key={`list-item-${index}`}>
             <AutoExpandingTextInput
               key={index}
               placeholder="+ List item"
