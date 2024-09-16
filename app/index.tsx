@@ -152,17 +152,91 @@ export default function Index() {
                 placeholder="Description"
                 onChangeText={(text)=> {if(singleNote){updateDesc(text, singleNote.id)}}}
               />
+              
+              {/* //Edit Incompleted List */}
               <FlatList
-                data={singleNote?.lists}
-                renderItem={({item, index})=>
-                  <TextInput
-                    key={index}
-                    style={styles.input} 
-                    value={item}
-                    placeholderTextColor={'#E6E6E6'}
-                    placeholder="+ List item"
-                    onChangeText={(text)=> {if(singleNote){handleListInputChange(text, index)}}}
-                />}
+               data={singleNote?.lists
+                .map((listItem, index) => ({ listItem, index })) 
+                .filter(({ index }) => !singleNote?.completedLists.includes(index)) 
+              }
+              renderItem={({ item: { listItem, index } }) => {
+                const isChecked = singleNote?.completedLists.includes(index)||false;
+                return (
+                  <View style={{flexDirection: 'row'}}>
+                    <CheckBox
+                      checked={isChecked}
+                      containerStyle={styles.checkboxContainer}
+                      textStyle={[styles.checkboxText, styles.checkboxComplete]}
+                      checkedColor="#979797"
+                      onPress={() => {
+                        const updatedNotes = notes.map((note) => {
+                          if (note.id === singleNote?.id) {
+                            const updatedCompletedLists = isChecked
+                              ? note.completedLists.filter(i => i !== index)
+                              : [...note.completedLists, index];
+                            return { ...note, completedLists: updatedCompletedLists };
+                          }
+                          return note;
+                        });
+                        setNotes(updatedNotes);
+                      }}
+                    />
+                    <TextInput
+                      key={index}
+                      style={styles.input} 
+                      value={listItem}
+                      placeholderTextColor={'#E6E6E6'}
+                      placeholder="+ List item"
+                      onChangeText={(text)=> {if(singleNote){handleListInputChange(text, index)}}}
+                    />
+                  </View>
+                );
+              }}
+              keyExtractor={(item, index) => index.toString()}
+              extraData={notes}
+              />
+
+              {/* Edit Completed List */}
+              <FlatList
+               data={singleNote?.lists
+                .map((listItem, index) => ({ listItem, index })) 
+                .filter(({ index }) => singleNote?.completedLists.includes(index)) 
+              }
+              renderItem={({ item: { listItem, index } }) => {
+                const isChecked = singleNote?.completedLists.includes(index)||false;
+                return (
+                  <View style={{flexDirection: 'row'}}>
+                    <CheckBox
+                      checked={isChecked}
+                      containerStyle={styles.checkboxContainer}
+                      textStyle={[styles.checkboxText, styles.checkboxComplete]}
+                      checkedColor="#979797"
+                      onPress={() => {
+                        const updatedNotes = notes.map((note) => {
+                          if (note.id === singleNote?.id) {
+                            const updatedCompletedLists = isChecked
+                              ? note.completedLists.filter(i => i !== index)
+                              : [...note.completedLists, index];
+                            return { ...note, completedLists: updatedCompletedLists };
+                          }
+                          return note;
+                        });
+                        setNotes(updatedNotes);
+                      }}
+                    />
+                    <TextInput
+                      key={index}
+                      style={styles.input} 
+                      value={listItem}
+                      placeholderTextColor={'#E6E6E6'}
+                      placeholder="+ List item"
+                      onChangeText={(text)=> {if(singleNote){handleListInputChange(text, index)}}}
+                    />
+                  </View>
+                );
+              }}
+              keyExtractor={(item, index) => index.toString()}
+              extraData={notes}
               />
             </View>
             <View style={styles.buttoncontainer}>
