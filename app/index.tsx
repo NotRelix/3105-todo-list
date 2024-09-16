@@ -181,6 +181,7 @@ export default function Index() {
                           return note;
                         });
                         setNotes(updatedNotes);
+                        setSingleNote(prev => prev ? { ...prev, completedLists: updatedNotes.find(note => note.id === prev.id)?.completedLists || [] } : undefined);
                       }}
                     />
                     )}
@@ -225,6 +226,7 @@ export default function Index() {
                           return note;
                         });
                         setNotes(updatedNotes);
+                        setSingleNote(prev => prev ? { ...prev, completedLists: updatedNotes.find(note => note.id === prev.id)?.completedLists || [] } : undefined);
                       }}
                     />
                     <TextInput
@@ -251,6 +253,7 @@ export default function Index() {
           </View>
         </View>
       </Modal>
+
       <FlatList
         numColumns={1}
         data={notes}
@@ -286,6 +289,7 @@ export default function Index() {
                         return note;
                       });
                       setNotes(updatedNotes);
+                      
                     }}
                   />
                 </View>
