@@ -86,15 +86,15 @@ export default function Index() {
       if (text === '' && index !== updatedLists.length - 1) {
           updatedLists.splice(index, 1);
       }
+      
+      const updatedNote = { ...singleNote, lists: updatedLists };
+      setSingleNote(updatedNote);  
 
-      setSingleNote({ ...singleNote, lists: updatedLists });
       const updatedNotes = notes.map(note => 
-          note.id === singleNote.id 
-              ? { ...note, lists: singleNote.lists }
-              : note 
+        note.id === singleNote.id ? { ...note, lists: updatedLists } : note
       );
-      setNotes(updatedNotes); 
-  }
+      setNotes(updatedNotes);
+    }
   }
 
   return (
