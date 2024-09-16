@@ -124,7 +124,7 @@ export default function Index() {
           setModalVisible(!modalVisible);
         }}>
         <View style={styles.centeredView}>
-          <View style={styles.modalView}>
+          <View style={[styles.modalView, {borderWidth: 5}]}>
             <View style={[styles.note, { borderWidth: 0 }]}>
               <TextInput
                 style={[styles.input, styles.inputTitle]} 
