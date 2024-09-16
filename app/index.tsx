@@ -22,6 +22,9 @@ export default function Index() {
   const [singleNote, setSingleNote] = useState<Note>();
 
   const addNotes = () => {
+    if (title.trim() === '' && description.trim() === '' && lists.every(list => list.trim() === '')) {
+      return;
+    }
     const curid = id + 1;
     const object: Note = { id: curid, title: title, description: description, lists: lists, completedLists: [] }; 
     setId(curid);
