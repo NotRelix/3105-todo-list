@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View, TextInput, FlatList, Modal} from "re
 import { useState } from "react";
 import { CheckBox } from '@rneui/themed';
 import { ListItem } from "@rneui/base";
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 interface Note{
   id: number;
@@ -111,6 +112,7 @@ export default function Index() {
         lists={lists}
         setLists={setLists}
       />
+      
       <Pressable style={styles.button} onPress={addNotes}>
         <Text style={styles.buttonLabel}>Add Note</Text>
       </Pressable>
@@ -123,20 +125,6 @@ export default function Index() {
         }}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <View style={styles.topcontainer}>
-              <View style={styles.buttoncontainer}>
-                <Pressable
-                      onPress={() => {
-                        if (singleNote) {
-                          deleteNote(singleNote.id);
-                          setModalVisible(!modalVisible);
-                        }
-                      }}
-                    >
-                  <Text style={styles.notetext}>Delete</Text>
-                </Pressable>
-              </View>
-            </View>
             <View style={[styles.note, { borderWidth: 0 }]}>
               <TextInput
                 style={[styles.input, styles.inputTitle]} 
@@ -268,9 +256,21 @@ export default function Index() {
               />
             </View>
             <View style={styles.buttoncontainer}>
+              {/* Delete */}
+              <Pressable
+                    onPress={() => {
+                      if (singleNote) {
+                        deleteNote(singleNote.id);
+                        setModalVisible(!modalVisible);
+                      }
+                    }}
+                  >
+                <Text style={[styles.icon,styles.notetext]}><Icon name="trash" size={20} color="white"/></Text>
+              </Pressable>
+              {/* Close */}
               <Pressable
                 onPress={() => setModalVisible(!modalVisible)}>
-                <Text style={styles.notetext}>Close</Text>
+                <Text style={[styles.icon, styles.notetext]}><Icon name="reply" size={20} color="white" /></Text>
               </Pressable>
             </View>
           </View>
@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
     // padding: 20,
     width: '100%',
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     alignItems: 'center'
   },
   centeredView: {
@@ -512,5 +512,8 @@ const styles = StyleSheet.create({
   checkboxComplete: {
     textDecorationLine: 'line-through',
     color: '#979797',
+  },
+  icon: {
+    padding: 10,
   }
 });
