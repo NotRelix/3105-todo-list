@@ -137,7 +137,7 @@ export default function Index() {
                 </Pressable>
               </View>
             </View>
-            <View style={styles.inputContainer}>
+            <View style={[styles.note, { borderWidth: 0 }]}>
               <TextInput
                 style={[styles.input, styles.inputTitle]} 
                 value={singleNote?.title}
@@ -242,6 +242,29 @@ export default function Index() {
               }}
               keyExtractor={(item, index) => index.toString()}
               extraData={notes}
+              />
+
+              {/* Select All/Unselect All for Incomplete Lists */}
+              <CheckBox
+                title={singleNote?.completedLists.length === singleNote?.lists.filter(listItem => listItem !== '').length ? "Unselect All" : "Select All"}
+                checked={singleNote?.completedLists.length === singleNote?.lists.filter(listItem => listItem !== '').length}
+                containerStyle={styles.checkboxContainer}
+                onPress={() => {
+                  const updatedNotes = notes.map((note) => {
+                    if (note.id === singleNote?.id) {
+                      const nonEmptyIndexes = singleNote.lists
+                        .map((listItem, index) => listItem.trim() !== '' ? index : null)
+                        .filter(index => index !== null);
+                      const updatedCompletedLists = singleNote.completedLists.length === nonEmptyIndexes.length
+                        ? [] 
+                        : nonEmptyIndexes;
+                      return { ...note, completedLists: updatedCompletedLists };
+                    }
+                    return note;
+                  });
+                  setNotes(updatedNotes);
+                  setSingleNote(prev => prev ? { ...prev, completedLists: updatedNotes.find(note => note.id === prev.id)?.completedLists || [] } : undefined);
+                }}
               />
             </View>
             <View style={styles.buttoncontainer}>
@@ -456,13 +479,13 @@ const styles = StyleSheet.create({
   },
   note: {
     width: 300,
+    marginBottom: 20,
     borderColor: '#E6E6E6',
     borderWidth: 1,
     borderBlockColor: '#E6E6E6',
     borderRadius: 8,
-    padding: 15,
+    padding: 10,
     fontSize: 18,
-    margin: 5,
     flexDirection: 'column',
     minHeight: 50,
   },
