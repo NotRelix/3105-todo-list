@@ -1,12 +1,15 @@
 import Input from "@/components/Input";
 import { Pressable, StyleSheet, Text, View, TextInput, FlatList, Modal} from "react-native";
 import { useState } from "react";
+import { CheckBox } from '@rneui/themed';
+import { ListItem } from "@rneui/base";
 
 interface Note{
   id: number;
   title: string;
   description: string;
   lists: Array<string>;
+  completedLists: Array<number>;
 }
 
 export default function Index() {
@@ -15,13 +18,12 @@ export default function Index() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [lists, setLists] = useState<string[]>(['']);
-  const [completedLists, setCompletedLists] = useState<string[]>(['']);
   const [notes, setNotes] = useState<Note[]>([]);
   const [singleNote, setSingleNote] = useState<Note>();
 
   const addNotes = () => {
     const curid = id + 1;
-    const object: Note = { id: curid, title: title, description: description, lists: lists }; 
+    const object: Note = { id: curid, title: title, description: description, lists: lists, completedLists: [] }; 
     setId(curid);
     setNotes([...notes, object]); 
     setTitle('');
@@ -32,10 +34,6 @@ export default function Index() {
   const deleteNote = (id: number) => {
     setNotes(notes.filter(note => note.id !== id));
   };
-
-  const addList = () => {
-
-  }
 
   const passNoteValue = (note: Note) => {
     setSingleNote(note);
@@ -177,15 +175,47 @@ export default function Index() {
         data={notes}
         key={singleNote?.id}
         renderItem={({item}) => 
-        <Pressable onPress={() => {setModalVisible(true); passNoteValue(item);}} style={styles.note}>
+        <View style={styles.note}>
           <Text style={[styles.notetext, styles.notetitle]}>{item.title}</Text>
           <Text style={styles.notetext}>{item.description}</Text>
 
           <FlatList
-            data={item.lists}
-            renderItem={({item})=> <Text style={styles.notetext}>{item}</Text>}
+            data={item.lists.filter((listItem => listItem !== ''))}
+            renderItem={({item: listItem, index})=> {
+              const isChecked = item.completedLists.includes(index);
+              return (
+              <View style={{ flexDirection:'row'}}>
+                <CheckBox
+                  title={listItem}
+                  checked={isChecked}
+                  onPress={() => {
+                    const updatedNotes = notes.map((note) => {
+                      if (note.id === item.id) {
+                        const updatedCompmletedLists = isChecked 
+                          ? note.completedLists.filter(i => i !== index)
+                          : [...note.completedLists, index];
+                          return { ...note, completedLists: updatedCompmletedLists}
+                      }
+                      return note;
+                    });
+                    setNotes(updatedNotes);
+                  }}
+                />
+              </View>
+              )
+            }}
+            keyExtractor={(item, index) => index.toString()}
           />
-        </Pressable>}
+          <Pressable 
+            style={styles.button}
+            onPress={() => {
+              setModalVisible(true);
+              passNoteValue(item);
+            }}
+          >
+            <Text style={styles.buttonLabel}>Edit</Text>
+          </Pressable>
+        </View>}
       />
     </View>
   );
