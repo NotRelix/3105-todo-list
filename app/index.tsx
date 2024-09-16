@@ -175,7 +175,7 @@ export default function Index() {
                     )}
                     <TextInput
                       key={index}
-                      style={[styles.input]}
+                      style={[styles.input, {fontWeight: 'bold'}]}
                       value={listItem}
                       placeholderTextColor={'#979797'}
                       placeholder="+ List item"
@@ -219,7 +219,7 @@ export default function Index() {
                     />
                     <TextInput
                       key={index}
-                      style={styles.input} 
+                      style={[styles.input, {fontWeight: 'bold'}]} 
                       value={listItem}
                       placeholderTextColor={'#E6E6E6'}
                       placeholder="+ List item"
