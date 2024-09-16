@@ -10,6 +10,7 @@ interface Note{
   description: string;
   lists: Array<string>;
   completedLists: Array<number>;
+  selectAll: boolean;
 }
 
 export default function Index() {
@@ -26,7 +27,7 @@ export default function Index() {
       return;
     }
     const curid = id + 1;
-    const object: Note = { id: curid, title: title, description: description, lists: lists, completedLists: [] }; 
+    const object: Note = { id: curid, title: title, description: description, lists: lists, completedLists: [], selectAll: false }; 
     setId(curid);
     setNotes([...notes, object]); 
     setTitle('');
@@ -217,8 +218,6 @@ export default function Index() {
             extraData={notes} 
           />
 
-          {item.completedLists.length > 0 && <Text style={[styles.content, styles.completed]}>Completed</Text>}
-
           <FlatList
             data={item.lists
               .map((listItem, index) => ({ listItem, index })) 
@@ -227,7 +226,7 @@ export default function Index() {
             renderItem={({ item: { listItem, index } }) => {
               const isChecked = item.completedLists.includes(index);
               return (
-                <View>
+                <View style={{flexDirection: 'row'}}>
                   <CheckBox
                     title={listItem}
                     checked={isChecked}
@@ -252,6 +251,27 @@ export default function Index() {
             }}
             keyExtractor={(item, index) => index.toString()}
             extraData={notes}
+          />
+
+          <CheckBox
+            title={item.completedLists.length === item.lists.filter(listItem => listItem !== '').length ? "Unselect All" : "Select All"}
+            checked={item.completedLists.length === item.lists.filter(listItem => listItem !== '').length}
+            containerStyle={styles.checkboxContainer}
+            onPress={() => {
+              const updatedNotes = notes.map((note) => {
+                if (note.id === item.id) {
+                  const nonEmptyIndexes = item.lists
+                    .map((listItem, index) => listItem.trim() !== '' ? index : null)
+                    .filter(index => index !== null);
+                  const updatedCompletedLists = item.completedLists.length === nonEmptyIndexes.length
+                    ? [] 
+                    : nonEmptyIndexes;
+                  return { ...note, completedLists: updatedCompletedLists };
+                }
+                return note;
+              });
+              setNotes(updatedNotes);
+            }}
           />
 
           <Pressable 
@@ -281,9 +301,8 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   buttoncontainer: {
-    padding: 20,
+    // padding: 20,
     width: '100%',
-    height: 20,
     flexDirection: 'row',
     justifyContent: 'flex-end',
     alignItems: 'center'
@@ -292,17 +311,14 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 22,
   },
   modalView: {
     margin: 5,
     borderWidth: 1,
     backgroundColor:'#25292E',
     borderColor: '#E6E6E6',
-    borderRadius: 20,
-    padding: 10,
+    borderRadius: 8,
     width: 300,
-    minHeight: 50,
     shadowOffset: {
       width: 0,
       height: 2,
@@ -313,8 +329,8 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     alignItems: "center",
-    paddingTop: 10,
-    paddingBottom: 20, 
+    // paddingTop: 10,
+    // paddingBottom: 20, 
   },
   input: {
     width: 280,
@@ -363,7 +379,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderBlockColor: '#E6E6E6',
     borderRadius: 8,
-    padding: 10,
+    padding: 15,
     fontSize: 18,
     margin: 5,
     flexDirection: 'column',
