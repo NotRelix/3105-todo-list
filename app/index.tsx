@@ -180,7 +180,7 @@ export default function Index() {
         renderItem={({item}) => 
         <View style={styles.note}>
           <Text style={[styles.notetext, styles.notetitle]}>{item.title}</Text>
-          <Text style={styles.notetext}>{item.description}</Text>
+          <Text style={[styles.notetext, styles.notedesc]}>{item.description}</Text>
 
           <FlatList
             data={item.lists
@@ -191,10 +191,12 @@ export default function Index() {
             renderItem={({ item: { listItem, index } }) => {
               const isChecked = item.completedLists.includes(index);
               return (
-                <View style={{ flexDirection: 'row' }}>
+                <View>
                   <CheckBox
                     title={listItem}
                     checked={isChecked}
+                    containerStyle={styles.checkboxContainer}
+                    textStyle={styles.checkboxText}
                     onPress={() => {
                       const updatedNotes = notes.map((note) => {
                         if (note.id === item.id) {
@@ -215,7 +217,7 @@ export default function Index() {
             extraData={notes} 
           />
 
-          {item.completedLists.length > 0 && <Text style={styles.content}>Completed:</Text>}
+          {item.completedLists.length > 0 && <Text style={[styles.content, styles.completed]}>Completed</Text>}
 
           <FlatList
             data={item.lists
@@ -225,14 +227,13 @@ export default function Index() {
             renderItem={({ item: { listItem, index } }) => {
               const isChecked = item.completedLists.includes(index);
               return (
-                <View style={{ flexDirection: 'row' }}>
+                <View>
                   <CheckBox
-                    title={
-                      <Text style={{ textDecorationLine: isChecked ? 'line-through' : 'none' }}>
-                        {listItem}
-                      </Text>
-                    }
+                    title={listItem}
                     checked={isChecked}
+                    containerStyle={styles.checkboxContainer}
+                    textStyle={[styles.checkboxText, styles.checkboxComplete]}
+                    checkedColor="#979797"
                     onPress={() => {
                       const updatedNotes = notes.map((note) => {
                         if (note.id === item.id) {
@@ -371,7 +372,25 @@ const styles = StyleSheet.create({
   notetext: {
     color: '#E6E6E6'
   },
+  notedesc: {
+    marginBottom: 10,
+  },
   content: {
     color: '#E6E6E6',
   },
+  completed: {
+    color: '#979797',
+    marginTop: 10,
+  },
+  checkboxContainer: {
+    backgroundColor: '#25292e',
+    padding: 0,
+  },
+  checkboxText: {
+    color: '#E6E6E6'
+  },
+  checkboxComplete: {
+    textDecorationLine: 'line-through',
+    color: '#979797',
+  }
 });
